@@ -116,23 +116,25 @@ _xdg_plugin_init() {
 
     _xdg_environment_init
 
-    # See https://wiki.zshell.dev/community/zsh_plugin_standard#functions-directory
-    if [[ $PMSPEC != *f* ]]; then
-        fpath+=( "${XDG[_PLUGIN_FNS_DIR]}" )
-    elif [[ ${zsh_loaded_plugins[-1]} != */xdg && -z ${fpath[(r)${XDG[_PLUGIN_FNS_DIR]}]} ]]; then
-        fpath+=( "${XDG[_PLUGIN_FNS_DIR]}" )
-    fi
+    if [[ -d "${XDG[_PLUGIN_DIR]}/functions" ]]; then
+        XDG[_PLUGIN_FNS_DIR]="${XDG[_PLUGIN_DIR]}/functions"
+        # See https://wiki.zshell.dev/community/zsh_plugin_standard#functions-directory
+        if [[ $PMSPEC != *f* ]]; then
+            fpath+=( "${XDG[_PLUGIN_FNS_DIR]}" )
+        elif [[ ${zsh_loaded_plugins[-1]} != */xdg && -z ${fpath[(r)${XDG[_PLUGIN_FNS_DIR]}]} ]]; then
+            fpath+=( "${XDG[_PLUGIN_FNS_DIR]}" )
+        fi
 
-    local fn
-    for fn in ${XDG[_PLUGIN_FNS_DIR]}/*(.:t); do
-        echo "autoload/remember ${fn}"
-        autoload -Uz ${fn}
-        _xdg_remember_fn ${fn}
-    done
+        local fn
+        for fn in ${XDG[_PLUGIN_FNS_DIR]}/*(.:t); do
+            autoload -Uz ${fn}
+            _xdg_remember_fn ${fn}
+        done
+    fi
 }
 _xdg_remember_fn _xdg_plugin_init
 
-_xdg_plugin_unload() {
+xdg_plugin_unload() {
     emulate -L zsh
 
     local plugin_fns
@@ -148,9 +150,8 @@ _xdg_plugin_unload() {
     # shellcheck disable=SC2296
     fpath=("${(@)fpath:#${0:A:h}}")
 
-    unfunction "${0}"
+    unfunction xdg_plugin_unload
 }
-_xdg_remember_fn _xdg_plugin_unload
 
 ############################################################################
 # Initialize Plugin
