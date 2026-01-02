@@ -1,0 +1,7 @@
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+
+emulate -L zsh
+
+# Return `0` if the default runtime location for the given package 
+# name exists, else `1`.
+[[ -d $(xdg_runtime_for "${1}") ]]

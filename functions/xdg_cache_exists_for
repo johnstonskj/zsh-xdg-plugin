@@ -1,0 +1,5 @@
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+
+# Return `0` if the default cache location for the given package 
+# name exists, else `1`.
+[[ -d $(xdg_cache_for "${1}") ]]

@@ -1,0 +1,7 @@
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+
+builtin emulate -L zsh
+
+# Return `0` if the default configuration location for the given package 
+# name exists, else `1`.
+[[ -d $(xdg_config_for "${1}") ]]

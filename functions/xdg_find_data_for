@@ -1,0 +1,17 @@
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+
+builtin emulate -L zsh
+
+local package="${1}"
+local data_dirs
+IFS=':' read -r -A data_dirs <<< "${XDG_DATA_DIRS}"
+
+local data_dir
+for data_dir in ${data_dirs[@]}; do
+    if [[ -d "${data_dir}/${package}" ]]; then
+        printf '%s' "${data_dir}/${package}"
+        return 0
+    fi
+done
+printf ''
+return 1

@@ -6,10 +6,13 @@
 
 # See https://wiki.zshell.dev/community/zsh_plugin_standard#zero-handling
 0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
-0="${${(M)0:#/*}:-$PWD/plugin_init}"
+0="${${(M)0:#/*}:-$PWD/$0}"
 
 # See https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugins-hash
 declare -gA XDG
+XDG[_PLUGIN_DIR]="${0:h}"
+XDG[_PLUGIN_FNS_DIR]="${XDG[_PLUGIN_DIR]}/functions"
+XDG[_FUNCTIONS]=""
 
 #
 # Public variables:
@@ -24,7 +27,7 @@ declare -gA XDG
 
 _xdg_remember_fn() {
     local fn_name="${1}"
-    if [[ -z ${XDG[_FUNCTIONS]} ]]; then
+    if [[ -z "${XDG[_FUNCTIONS]}" ]]; then
         XDG[_FUNCTIONS]="${fn_name}"
     elif [[ ",${XDG[_FUNCTIONS]}," != *",${fn_name},"* ]]; then
         XDG[_FUNCTIONS]="${XDG[_FUNCTIONS]},${fn_name}"
@@ -111,10 +114,6 @@ _xdg_remember_fn _xdg_environment_init
 _xdg_plugin_init() {
     emulate -L zsh
 
-    XDG[_PLUGIN_DIR]="${0:h}"
-    XDG[_PLUGIN_FNS_DIR]="${XDG[_PLUGIN_DIR]}/functions"
-    XDG[_FUNCTIONS]=""
-
     _xdg_environment_init
 
     # See https://wiki.zshell.dev/community/zsh_plugin_standard#functions-directory
@@ -123,6 +122,13 @@ _xdg_plugin_init() {
     elif [[ ${zsh_loaded_plugins[-1]} != */xdg && -z ${fpath[(r)${XDG[_PLUGIN_FNS_DIR]}]} ]]; then
         fpath+=( "${XDG[_PLUGIN_FNS_DIR]}" )
     fi
+
+    local fn
+    for fn in ${XDG[_PLUGIN_FNS_DIR]}/*(.:t); do
+        echo "autoload/remember ${fn}"
+        autoload -Uz ${fn}
+        _xdg_remember_fn ${fn}
+    done
 }
 _xdg_remember_fn _xdg_plugin_init
 

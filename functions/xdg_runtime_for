@@ -1,0 +1,5 @@
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+
+# Return the runtime configuration location for the given package name.
+local package="${1}"
+printf '%s' "${XDG_RUNTIME_HOME}/${package}"

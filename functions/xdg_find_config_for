@@ -1,0 +1,17 @@
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+
+builtin emulate -L zsh
+
+local package="${1}"
+local config_dirs
+IFS=':' read -r -A config_dirs <<< "${XDG_CONFIG_DIRS}"
+
+local config_dir
+for config_dir in ${config_dirs[@]}; do
+    if [[ -d "${config_dir}/${package}" ]]; then
+        printf '%s' "${config_dir}/${package}"
+        return 0
+    fi
+done
+printf ''
+return 1

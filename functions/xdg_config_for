@@ -1,0 +1,7 @@
+# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+
+builtin emulate -L zsh
+
+# Return the default configuration location for the given package name.
+local package="${1}"
+printf '%s' "${XDG_CONFIG_HOME}/${package}"
