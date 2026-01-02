@@ -1,0 +1,116 @@
+name: Shell Test
+
+on:
+  push:
+    branches: [ main ]
+  
+  pull_request:
+    branches: [ main ]
+
+  schedule:
+  - cron: '12 12 12 * *'
+
+jobs:
+
+  test:
+    name: Test
+
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "macos-latest"]
+        shell: ["bash", "zsh"]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install/Update Zsh
+      if: matrix.shell == 'zsh'
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt-get update
+            sudo apt install -y zsh
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install zsh
+        else
+            echo "$RUNNER_OS not supported"
+            exit 1
+        fi
+      shell: bash
+
+    - name: Install shellspec
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+            curl -fsSL https://git.io/shellspec | sh -s -- --yes
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install shellspec
+        else
+            echo "$RUNNER_OS not supported"
+            exit 1
+        fi
+      shell: bash
+
+    - name: Check test source
+      run: shellspec --syntax-check
+
+    - name: Run tests
+      run: shellspec --shell=${{ matrix.shell }} --format documentation --output junit
+
+
+    - name: Publish Test Report with Insights
+      uses: ctrf-io/github-test-reporter@v1
+      with:
+        report-path: './report/*.xml'
+        integrations-config: |
+          {
+            "junit-to-ctrf": {
+              "enabled": true,
+              "action": "convert",
+              "options": {
+                "output": "./ctrf-reports/ctrf-report.json",
+                "toolname": "junit-to-ctrf",
+                "useSuiteName": false,
+                "env": {
+                  "appName": "my-app"
+                }
+              }
+            }
+          }
+        summary-delta-report: true
+        insights-report: true
+        previous-results-report: true
+        failed-folded-report: true
+        flaky-rate-report: true
+        fail-rate-report: true
+        slowest-report: true
+        upload-artifact: true
+        artifact-name: test_report-${{ matrix.os }}-${{ matrix.shell }}
+      if: always()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish Test Report with Pull Request Comment
+      uses: ctrf-io/github-test-reporter@v1
+      with:
+        report-path: './report/*.xml'
+        integrations-config: |
+          {
+            "junit-to-ctrf": {
+              "enabled": true,
+              "action": "convert",
+              "options": {
+                "output": "./ctrf-reports/ctrf-report.json",
+                "toolname": "junit-to-ctrf",
+                "useSuiteName": false,
+                "env": {
+                  "appName": "my-app"
+                }
+              }
+            }
+          }
+        pull-request-report: true
+        artifact-name: pr_report-${{ matrix.os }}-${{ matrix.shell }}
+      if: github.event_name == 'pull_request'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
