@@ -8,6 +8,24 @@ XDG directory environment plugin for Zsh.
 
 Complete Description...
 
+## Functions
+
+* Package path functions:
+  * `xdg_cache_for`
+  * `xdg_config_for`
+  * `xdg_data_for`
+  * `xdg_runtime_for`
+  * `xdg_state_for`
+* Package path exist functions:
+  * `xdg_cache_exists_for`
+  * `xdg_config_exists_for`
+  * `xdg_data_exists_for`
+  * `xdg_runtime_exists_for`
+  * `xdg_state_exists_for`
+* Package path _find_ functions:
+  * `xdg_find_config_for`
+  * `xdg_find_data_for`
+
 ## License(s)
 
 The contents of this repository are made available under the following
