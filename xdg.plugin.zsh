@@ -50,11 +50,8 @@ _xdg_environment_init() {
     fi
 
     if [[ -s ${XDG_CONFIG_HOME}/base-dirs.dirs ]]; then
-        log_info "Loading environment from ${XDG_CONFIG_HOME}/base-dirs.dirs"
         load_and_export ${XDG_CONFIG_HOME}/base-dirs.dirs
     else
-        log_info "Setting base-dirs.dirs environment manually"
-
         if [[ -d "${HOME}/.cache" ]]; then
             export XDG_CACHE_HOME="${HOME}/.cache"
         elif [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
@@ -97,10 +94,8 @@ _xdg_environment_init() {
     fi
 
     if [[ -s ${XDG_CONFIG_HOME}/user-dirs.dirs ]]; then
-        log_info "Loading environment from ${XDG_CONFIG_HOME}/user-dirs.dirs"
         load_and_export ${XDG_CONFIG_HOME}/user-dirs.dirs
     else
-        log_info "Setting base-dirs.dirs environment manually"
         export XDG_DESKTOP_DIR="${HOME}/Desktop"
         export XDG_DOWNLOAD_DIR="${HOME}/Downloads"
         export XDG_TEMPLATES_DIR="${HOME}/Templates"
