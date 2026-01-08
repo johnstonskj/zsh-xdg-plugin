@@ -144,11 +144,12 @@ xdg_plugin_unload() {
     for fn in ${plugin_fns[@]}; do
         whence -w "${fn}" &> /dev/null && unfunction "${fn}"
     done
-    
-    unset XDG
 
-    # shellcheck disable=SC2296
-    fpath=("${(@)fpath:#${0:A:h}}")
+    # Removing path/fpath entries.
+    fpath=( "${(@)fpath:#${XDG[_PLUGIN_FNS_DIR]}}" )
+
+    # Remove the global data variable (after above!).
+    unset XDG
 
     unfunction xdg_plugin_unload
 }
