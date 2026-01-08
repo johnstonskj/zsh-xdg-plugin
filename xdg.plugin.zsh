@@ -1,4 +1,18 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+#
+# Plugin Name: xdg
+# Description: Zsh plugin to bootstrap/setup XDG Base Directory environment variables.
+# Repository: https://github.com/johnstonskj/zsh-xdg-plugin
+#
+# Public variables:
+#
+# * `XDG`; plugin-defined global associative array with the following keys:
+#   * `_PLUGIN_DIR`; the directory the plugin is sourced from.
+#   * `_PLUGIN_FNS_DIR`; the directory of plugin functions.
+#   * `_FUNCTIONS`; a list of all functions defined by the plugin.
+# * `XDG_USE_MACOS_LIBRARY`; if set, use the Apple _File System Programming
+#   Guide_ for directories rather than the POSIX versions.
+#
 
 ############################################################################
 # Standard Setup Behavior
@@ -13,13 +27,6 @@ declare -gA XDG
 XDG[_PLUGIN_DIR]="${0:h}"
 XDG[_PLUGIN_FNS_DIR]="${XDG[_PLUGIN_DIR]}/functions"
 XDG[_FUNCTIONS]=""
-
-#
-# Public variables:
-#
-# - `XDG_USE_MACOS_LIBRARY`; if set, use the Apple _File System Programming
-#   Guide_ for directories rather than the POSIX versions.
-#
 
 ############################################################################
 # Internal Support Functions
