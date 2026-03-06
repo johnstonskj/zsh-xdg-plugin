@@ -1,48 +1,23 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 #
-# Plugin Name: xdg
-# Description: Zsh plugin to bootstrap/setup XDG Base Directory environment variables.
-# Repository: https://github.com/johnstonskj/zsh-xdg-plugin
+# @name xdg
+# @brief Zsh plugin to bootstrap/setup XDG Base Directory environment variables.
+# @repository https://github.com/johnstonskj/zsh-xdg-plugin
 #
-# Public variables:
+# ### Public Variables
 #
-# * `XDG`; plugin-defined global associative array with the following keys:
-#   * `_PLUGIN_DIR`; the directory the plugin is sourced from.
-#   * `_PLUGIN_FNS_DIR`; the directory of plugin functions.
-#   * `_FUNCTIONS`; a list of all functions defined by the plugin.
 # * `XDG_USE_MACOS_LIBRARY`; if set, use the Apple _File System Programming
 #   Guide_ for directories rather than the POSIX versions.
 #
 
 ############################################################################
-# Standard Setup Behavior
-############################################################################
+# @section Lifecycle
+# @description Plugin lifecycle functions.
+#
 
-# See https://wiki.zshell.dev/community/zsh_plugin_standard#zero-handling
-0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
-0="${${(M)0:#/*}:-$PWD/$0}"
+xdg_plugin_init() {
+    emulate -L zsh
 
-# See https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugins-hash
-declare -gA XDG
-XDG[_PLUGIN_DIR]="${0:h}"
-XDG[_PLUGIN_FNS_DIR]="${XDG[_PLUGIN_DIR]}/functions"
-XDG[_FUNCTIONS]=""
-
-############################################################################
-# Internal Support Functions
-############################################################################
-
-_xdg_remember_fn() {
-    local fn_name="${1}"
-    if [[ -z "${XDG[_FUNCTIONS]}" ]]; then
-        XDG[_FUNCTIONS]="${fn_name}"
-    elif [[ ",${XDG[_FUNCTIONS]}," != *",${fn_name},"* ]]; then
-        XDG[_FUNCTIONS]="${XDG[_FUNCTIONS]},${fn_name}"
-    fi
-}
-_xdg_remember_fn _xdg_remember_fn
-
-_xdg_environment_init() {
     load_and_export() {
         local file_name="${1}"
         while IFS= read -r line; do
@@ -53,6 +28,7 @@ _xdg_environment_init() {
     }
 
     # This is for bootstrap purposes only
+    @zplugins_envvar_save xdg XDG_CONFIG_HOME
     if [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
         export XDG_CONFIG_HOME="${HOME}/Library/Application\ Support/.config"
     else
@@ -62,6 +38,7 @@ _xdg_environment_init() {
     if [[ -s ${XDG_CONFIG_HOME}/base-dirs.dirs ]]; then
         load_and_export ${XDG_CONFIG_HOME}/base-dirs.dirs
     else
+        @zplugins_envvar_save xdg XDG_CACHE_HOME
         if [[ -d "${HOME}/.cache" ]]; then
             export XDG_CACHE_HOME="${HOME}/.cache"
         elif [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
@@ -70,30 +47,35 @@ _xdg_environment_init() {
             export XDG_CACHE_HOME="$(dirname "${TMPDIR}")/C/.cache"
         fi
         
+        @zplugins_envvar_save xdg XDG_CONFIG_DIRS
         if [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
-            export XDG_CONFIG_DIRS="${HOME}/.config"
+            export XDG_CONFIG_DIRS="${XDG_CONFIG_HOME}"
         else
             export XDG_CONFIG_DIRS=":"
         fi
         
-        if [[ -d "${HOME}/.local/share" ]]; then
-            export XDG_DATA_HOME="${HOME}/.local/share"
-        else
+        @zplugins_envvar_save xdg XDG_DATA_HOME
+        if [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
             export XDG_DATA_HOME="${HOME}/Library/Application\ Support/.local/share"
+        else
+            export XDG_DATA_HOME="${HOME}/.local/share"
         fi
         
+        @zplugins_envvar_save xdg XDG_DATA_DIRS
         if [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
             export XDG_DATA_DIRS="${HOME}/.local/share:/usr/local/share:/usr/share"
         else
             export XDG_DATA_DIRS="/usr/local/share:/usr/share"
         fi
 
+        @zplugins_envvar_save xdg XDG_STATE_HOME
         if [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
             export XDG_STATE_HOME="${HOME}/Library/Application\ Support/.local/state"
         else
             export XDG_STATE_HOME="${HOME}/.local/state"
         fi
         
+        @zplugins_envvar_save xdg XDG_RUNTIME_HOME
         if [[ -d "${HOME}/.local/runtime" ]]; then
             export XDG_RUNTIME_HOME="${HOME}/.local/runtime"
         elif [[ "${OSTYPE}" == Linux* ]]; then
@@ -106,64 +88,41 @@ _xdg_environment_init() {
     if [[ -s ${XDG_CONFIG_HOME}/user-dirs.dirs ]]; then
         load_and_export ${XDG_CONFIG_HOME}/user-dirs.dirs
     else
+        @zplugins_envvar_save xdg XDG_DESKTOP_DIR
         export XDG_DESKTOP_DIR="${HOME}/Desktop"
+        @zplugins_envvar_save xdg XDG_DOWNLOAD_DIR
         export XDG_DOWNLOAD_DIR="${HOME}/Downloads"
+        @zplugins_envvar_save xdg XDG_TEMPLATES_DIR
         export XDG_TEMPLATES_DIR="${HOME}/Templates"
+        @zplugins_envvar_save xdg XDG_PUBLICSHARE_DIR
         export XDG_PUBLICSHARE_DIR="${HOME}/Public"
+        @zplugins_envvar_save xdg XDG_DOCUMENTS_DIR
         export XDG_DOCUMENTS_DIR="${HOME}/Documents"
+        @zplugins_envvar_save xdg XDG_MUSIC_DIR
         export XDG_MUSIC_DIR="${HOME}/Music"
+        @zplugins_envvar_save xdg XDG_PICTURES_DIR
         export XDG_PICTURES_DIR="${HOME}/Pictures"
+        @zplugins_envvar_save xdg XDG_VIDEOS_DIR
         export XDG_VIDEOS_DIR="${HOME}/Movies"
     fi
 }
-_xdg_remember_fn _xdg_environment_init
-
-_xdg_plugin_init() {
-    emulate -L zsh
-
-    _xdg_environment_init
-
-    if [[ -d "${XDG[_PLUGIN_DIR]}/functions" ]]; then
-        XDG[_PLUGIN_FNS_DIR]="${XDG[_PLUGIN_DIR]}/functions"
-        # See https://wiki.zshell.dev/community/zsh_plugin_standard#functions-directory
-        if [[ $PMSPEC != *f* ]]; then
-            fpath+=( "${XDG[_PLUGIN_FNS_DIR]}" )
-        elif [[ ${zsh_loaded_plugins[-1]} != */xdg && -z ${fpath[(r)${XDG[_PLUGIN_FNS_DIR]}]} ]]; then
-            fpath+=( "${XDG[_PLUGIN_FNS_DIR]}" )
-        fi
-
-        local fn
-        for fn in ${XDG[_PLUGIN_FNS_DIR]}/*(.:t); do
-            autoload -Uz ${fn}
-            _xdg_remember_fn ${fn}
-        done
-    fi
-}
-_xdg_remember_fn _xdg_plugin_init
 
 xdg_plugin_unload() {
     emulate -L zsh
 
-    local plugin_fns
-    IFS=',' read -r -A plugin_fns <<< "${XDG[_FUNCTIONS]}"
-
-    local fn
-    for fn in ${plugin_fns[@]}; do
-        whence -w "${fn}" &> /dev/null && unfunction "${fn}"
-    done
-
-    # Removing path/fpath entries.
-    fpath=( "${(@)fpath:#${XDG[_PLUGIN_FNS_DIR]}}" )
-
-    # Remove the global data variable (after above!).
-    unset XDG
-
-    unfunction xdg_plugin_unload
+    @zplugins_envvar_restore xdg XDG_CONFIG_HOME
+    @zplugins_envvar_restore xdg XDG_CACHE_HOME
+    @zplugins_envvar_restore xdg XDG_CONFIG_DIRS
+    @zplugins_envvar_restore xdg XDG_DATA_HOME
+    @zplugins_envvar_restore xdg XDG_DATA_DIRS
+    @zplugins_envvar_restore xdg XDG_STATE_HOME        
+    @zplugins_envvar_restore xdg XDG_RUNTIME_HOME
+    @zplugins_envvar_restore xdg XDG_DESKTOP_DIR
+    @zplugins_envvar_restore xdg XDG_DOWNLOAD_DIR
+    @zplugins_envvar_restore xdg XDG_TEMPLATES_DIR
+    @zplugins_envvar_restore xdg XDG_PUBLICSHARE_DIR
+    @zplugins_envvar_restore xdg XDG_DOCUMENTS_DIR
+    @zplugins_envvar_restore xdg XDG_MUSIC_DIR
+    @zplugins_envvar_restore xdg XDG_PICTURES_DIR
+    @zplugins_envvar_restore xdg XDG_VIDEOS_DIR
 }
-
-############################################################################
-# Initialize Plugin
-############################################################################
-
-_xdg_plugin_init
-true
