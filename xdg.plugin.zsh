@@ -1,8 +1,10 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 #
-# @name xdg
-# @brief Zsh plugin to bootstrap/setup XDG Base Directory environment variables.
-# @repository https://github.com/johnstonskj/zsh-xdg-plugin
+# @name: xdg
+# @brief: Bootstrap/setup the XDG Base Directory environment variables.
+# @repository: https://github.com/johnstonskj/zsh-xdg-plugin
+# @version: 0.1.1
+# @license: MIT AND Apache-2.0
 #
 # ### Public Variables
 #
