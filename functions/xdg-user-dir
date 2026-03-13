@@ -1,5 +1,9 @@
 # shellcheck shell=bash disable=SC2296 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 
+builtin emulate -L zsh
+
+typeset -gi EC_SUCCESS
+
 declare user_dirs_file="${XDG_CONFIG_HOME:-${HOME}/.config}/user-dirs.dirs"
 
 if [[ -f "${user_dirs_file}" ]] ; then
@@ -15,4 +19,4 @@ else
     echo "${(P)var_name}"
 fi
 
-return 0
+return ${EC_SUCCESS}
