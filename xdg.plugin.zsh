@@ -32,9 +32,9 @@ xdg_plugin_init() {
     # This is for bootstrap purposes only
     @zplugins_envvar_save xdg XDG_CONFIG_HOME
     if [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
-        export XDG_CONFIG_HOME="${HOME}/Library/Application\ Support/.config"
+        typeset -g XDG_CONFIG_HOME="${HOME}/Library/Application\ Support/.config"
     else
-        export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-${HOME}/.config}"
+        typeset -g XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-${HOME}/.config}"
     fi
 
     if [[ -s ${XDG_CONFIG_HOME}/base-dirs.dirs ]]; then
@@ -42,48 +42,48 @@ xdg_plugin_init() {
     else
         @zplugins_envvar_save xdg XDG_CACHE_HOME
         if [[ -d "${HOME}/.cache" ]]; then
-            export XDG_CACHE_HOME="${HOME}/.cache"
+            typeset -g XDG_CACHE_HOME="${HOME}/.cache"
         elif [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
-            export XDG_CACHE_HOME=$"${HOME}/Library/Application\ Support/Caches/.cache"
+            typeset -g XDG_CACHE_HOME=$"${HOME}/Library/Application\ Support/Caches/.cache"
         else
-            export XDG_CACHE_HOME="$(dirname "${TMPDIR}")/C/.cache"
+            typeset -g XDG_CACHE_HOME="$(dirname "${TMPDIR}")/C/.cache"
         fi
         
         @zplugins_envvar_save xdg XDG_CONFIG_DIRS
         if [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
-            export XDG_CONFIG_DIRS="${XDG_CONFIG_HOME}"
+            typeset -g XDG_CONFIG_DIRS="${XDG_CONFIG_HOME}"
         else
-            export XDG_CONFIG_DIRS=":"
+            typeset -g XDG_CONFIG_DIRS=":"
         fi
         
         @zplugins_envvar_save xdg XDG_DATA_HOME
         if [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
-            export XDG_DATA_HOME="${HOME}/Library/Application\ Support/.local/share"
+            typeset -g XDG_DATA_HOME="${HOME}/Library/Application\ Support/.local/share"
         else
-            export XDG_DATA_HOME="${HOME}/.local/share"
+            typeset -g XDG_DATA_HOME="${HOME}/.local/share"
         fi
         
         @zplugins_envvar_save xdg XDG_DATA_DIRS
         if [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
-            export XDG_DATA_DIRS="${HOME}/.local/share:/usr/local/share:/usr/share"
+            typeset -g XDG_DATA_DIRS="${HOME}/.local/share:/usr/local/share:/usr/share"
         else
-            export XDG_DATA_DIRS="/usr/local/share:/usr/share"
+            typeset -g XDG_DATA_DIRS="/usr/local/share:/usr/share"
         fi
 
         @zplugins_envvar_save xdg XDG_STATE_HOME
         if [[ "${OSTYPE}" == darwin* && -n "${XDG_USE_MACOS_LIBRARY}" ]]; then
-            export XDG_STATE_HOME="${HOME}/Library/Application\ Support/.local/state"
+            typeset -g XDG_STATE_HOME="${HOME}/Library/Application\ Support/.local/state"
         else
-            export XDG_STATE_HOME="${HOME}/.local/state"
+            typeset -g XDG_STATE_HOME="${HOME}/.local/state"
         fi
         
         @zplugins_envvar_save xdg XDG_RUNTIME_HOME
         if [[ -d "${HOME}/.local/runtime" ]]; then
-            export XDG_RUNTIME_HOME="${HOME}/.local/runtime"
+            typeset -g XDG_RUNTIME_HOME="${HOME}/.local/runtime"
         elif [[ "${OSTYPE}" == Linux* ]]; then
-            export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+            typeset -g XDG_RUNTIME_DIR="/run/user/$(id -u)"
         else
-            export XDG_RUNTIME_HOME="$(dirname "$TMPDIR")/T/.local/runtime"
+            typeset -g XDG_RUNTIME_HOME="$(dirname "$TMPDIR")/T/.local/runtime"
         fi
     fi
 
@@ -91,21 +91,21 @@ xdg_plugin_init() {
         load_and_export ${XDG_CONFIG_HOME}/user-dirs.dirs
     else
         @zplugins_envvar_save xdg XDG_DESKTOP_DIR
-        export XDG_DESKTOP_DIR="${HOME}/Desktop"
+        typeset -g XDG_DESKTOP_DIR="${HOME}/Desktop"
         @zplugins_envvar_save xdg XDG_DOWNLOAD_DIR
-        export XDG_DOWNLOAD_DIR="${HOME}/Downloads"
+        typeset -g XDG_DOWNLOAD_DIR="${HOME}/Downloads"
         @zplugins_envvar_save xdg XDG_TEMPLATES_DIR
-        export XDG_TEMPLATES_DIR="${HOME}/Templates"
+        typeset -g XDG_TEMPLATES_DIR="${HOME}/Templates"
         @zplugins_envvar_save xdg XDG_PUBLICSHARE_DIR
-        export XDG_PUBLICSHARE_DIR="${HOME}/Public"
+        typeset -g XDG_PUBLICSHARE_DIR="${HOME}/Public"
         @zplugins_envvar_save xdg XDG_DOCUMENTS_DIR
-        export XDG_DOCUMENTS_DIR="${HOME}/Documents"
+        typeset -g XDG_DOCUMENTS_DIR="${HOME}/Documents"
         @zplugins_envvar_save xdg XDG_MUSIC_DIR
-        export XDG_MUSIC_DIR="${HOME}/Music"
+        typeset -g XDG_MUSIC_DIR="${HOME}/Music"
         @zplugins_envvar_save xdg XDG_PICTURES_DIR
-        export XDG_PICTURES_DIR="${HOME}/Pictures"
+        typeset -g XDG_PICTURES_DIR="${HOME}/Pictures"
         @zplugins_envvar_save xdg XDG_VIDEOS_DIR
-        export XDG_VIDEOS_DIR="${HOME}/Movies"
+        typeset -g XDG_VIDEOS_DIR="${HOME}/Movies"
     fi
 }
 
