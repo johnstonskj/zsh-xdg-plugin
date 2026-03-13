@@ -1,17 +1,27 @@
-# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+# shellcheck shell=bash # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+#
+# @description
+# 
+# Return a path to the first _existing_ folder that for the package named in `$1` that
+# is in one of the directories in the array `XDG_DATA_DIRS`.
+#
 
 builtin emulate -L zsh
 
-local package="${1}"
-local data_dirs
+typeset -gi EC_SUCCESS
+typeset -gi EC_ERROR
+
+declare package="${1}"
+declare -a data_dirs
 IFS=':' read -r -A data_dirs <<< "${XDG_DATA_DIRS}"
 
-local data_dir
-for data_dir in ${data_dirs[@]}; do
+declare data_dir
+for data_dir in "${data_dirs[@]}"; do
     if [[ -d "${data_dir}/${package}" ]]; then
         printf '%s' "${data_dir}/${package}"
-        return 0
+        return ${EC_SUCCESS}
     fi
 done
+
 printf ''
-return 1
+return ${EC_ERROR}

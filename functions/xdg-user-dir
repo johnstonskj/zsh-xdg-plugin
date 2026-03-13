@@ -1,0 +1,18 @@
+# shellcheck shell=bash disable=SC2296 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+
+declare user_dirs_file="${XDG_CONFIG_HOME:-${HOME}/.config}/user-dirs.dirs"
+
+if [[ -f "${user_dirs_file}" ]] ; then
+    # shellcheck disable=SC1090
+    source "${user_dirs_file}"
+fi
+
+if [[ -z "" ]]; then
+    echo "${HOME}"
+else
+    # shellcheck disable=SC2034
+    declare var_name="XDG_${1}_DIR"
+    echo "${(P)var_name}"
+fi
+
+return 0

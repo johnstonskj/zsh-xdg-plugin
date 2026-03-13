@@ -1,7 +1,23 @@
-# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+# shellcheck shell=bash # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+#
+# @description
+# 
+# Return a path to a folder within the current `XDG_CACHE_HOME` for the package name
+# provided as `$1`.
+#
 
 builtin emulate -L zsh
 
-# Return the default cache location for the given package name.
-local package="${1}"
-printf '%s' "${XDG_CACHE_HOME}/${package}"
+typeset -gi EC_SUCCESS
+
+declare package="${1}"
+declare create_if_not_exists="${2}"
+declare package_path="${XDG_CACHE_HOME}/${package}"
+
+if [[ ! -d "${package_path}" && "${create_if_not_exists}" =~ (#i)(create|true|yes|1) ]]; then
+    mkdir -p "${package_path}"
+fi
+
+printf '%s' "${package_path}"
+
+return ${EC_SUCCESS}

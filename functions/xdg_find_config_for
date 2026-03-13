@@ -1,17 +1,28 @@
-# -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+# shellcheck shell=bash # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+#
+# @description
+# 
+# Return a path to the first _existing_ folder that for the package named in `$1` that
+# is in one of the directories in the array `XDG_CONFIG_DIRS`.
+#
 
 builtin emulate -L zsh
 
-local package="${1}"
-local config_dirs
+typeset -gi EC_SUCCESS
+typeset -gi EC_ERROR
+
+declare package="${1}"
+declare -a config_dirs
 IFS=':' read -r -A config_dirs <<< "${XDG_CONFIG_DIRS}"
 
-local config_dir
-for config_dir in ${config_dirs[@]}; do
+declare config_dir
+for config_dir in "${config_dirs[@]}"; do
     if [[ -d "${config_dir}/${package}" ]]; then
         printf '%s' "${config_dir}/${package}"
-        return 0
+
+        return ${EC_SUCCESS}
     fi
 done
+
 printf ''
-return 1
+return ${EC_ERROR}
